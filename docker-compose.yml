@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   cms:
-    image: microweber/microweber:latest
+    image: registry.gitlab.com/doora-cloud/microservices/microweber:latest
     restart: always
     expose:
       - 80
