@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  cms:
+    image: microweber/microweber:latest
+    restart: always
+    volumes:
+      - ${VOLUME_DIR}/data:/var/www/html
+    expose:
+      - 80
+    networks:
+      - internal
+      - nginx
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    links:
+      - mariadb:db
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+  mariadb:
+    image: mariadb:10
+    restart: always
+    volumes:
+      - ${VOLUME_DIR}/mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    expose:
+      - 3306
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+networks:
+  internal:
+  nginx:
+    name: nginx
+    external: true
