@@ -4,8 +4,6 @@ services:
   cms:
     image: microweber/microweber:latest
     restart: always
-    volumes:
-      - ${VOLUME_DIR}/data:/var/www/html
     expose:
       - 80
     networks:
